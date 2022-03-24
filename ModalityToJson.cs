@@ -6,18 +6,14 @@ using Rdmp.Core.Startup;
 
 internal class ModalityToJson
 {
-    private string modality;
     private Catalogue[] modalityCatalogues;
-    private LinkedRepositoryProvider repo;
     private DQERepository dqe;
     private ModalityInfo modalityInfo;
     private Dictionary<string, MonthCount> monthCounts;
 
     public ModalityToJson(string modality, Catalogue[] modalityCatalogues, LinkedRepositoryProvider repo)
     {
-        this.modality = modality;
         this.modalityCatalogues = modalityCatalogues;
-        this.repo = repo;
 
         this.dqe = new DQERepository(repo.CatalogueRepository);
 
