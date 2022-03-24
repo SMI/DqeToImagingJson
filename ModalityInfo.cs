@@ -11,6 +11,6 @@
         public DateTime? EvaluationDate { get; set; }
 
         public List<MonthCount> CountsPerMonth { get; set; }
-
+        public List<TagInfo> Tags { get; internal set; }
     }
 }

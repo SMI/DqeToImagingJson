@@ -10,6 +10,7 @@ internal class ModalityToJson
     private DQERepository dqe;
     private ModalityInfo modalityInfo;
     private Dictionary<string, MonthCount> monthCounts;
+    private Dictionary<string, TagInfo> tagInfo;
 
     public ModalityToJson(string modality, Catalogue[] modalityCatalogues, LinkedRepositoryProvider repo)
     {
@@ -20,7 +21,7 @@ internal class ModalityToJson
         modalityInfo = new ModalityInfo();
         modalityInfo.Modality = modality;
         monthCounts = new Dictionary<string, MonthCount>();
-
+        tagInfo = new Dictionary<string, TagInfo>();
     }
 
     internal ModalityInfo GetModalityInfo()
@@ -32,25 +33,25 @@ internal class ModalityToJson
 
         if (study != null)
         {
-            AddCounts(study,c => modalityInfo.TotalNoStudies = c, (m,c)=>m.StudyCount = c);
+            AddCounts("Study",study,c => modalityInfo.TotalNoStudies = c, (m,c)=>m.StudyCount = c);
         }
 
         if (series != null)
         {
-            AddCounts(series, c => modalityInfo.TotalNoSeries = c, (m, c) => m.SeriesCount = c);
+            AddCounts("Series",series, c => modalityInfo.TotalNoSeries = c, (m, c) => m.SeriesCount = c);
         }
 
         if (image != null)
         {
-            AddCounts(image, c => modalityInfo.TotalNoImages = c, (m, c) => m.ImageCount = c);
+            AddCounts("Image",image, c => modalityInfo.TotalNoImages = c, (m, c) => m.ImageCount = c);
         }
 
         modalityInfo.CountsPerMonth = monthCounts.Values.ToList();
-
+        modalityInfo.Tags = tagInfo.Values.ToList();
         return modalityInfo;
     }
 
-    private void AddCounts(Catalogue catalogue, Action<int> totalCount, Action<MonthCount,int> monthCount)
+    private void AddCounts(string level, Catalogue catalogue, Action<int> totalCount, Action<MonthCount,int> monthCount)
     {
         var evaluation = dqe.GetMostRecentEvaluationFor(catalogue);
         
@@ -70,6 +71,27 @@ internal class ModalityToJson
             }
 
             monthCount(monthCounts[date], dates.Value.Total);
+        }
+
+        foreach(var col in evaluation.ColumnStates)
+        {
+            if(col.PivotCategory == "ALL")
+            {
+                // we have already seen this tag in a higher level
+                if (tagInfo.ContainsKey(col.TargetProperty))
+                    continue;
+                
+                var info = new TagInfo(col.TargetProperty);
+                info.Level = level;
+
+                // the total number of values seen in this column (including nulls)
+                var total = col.CountCorrect + col.CountWrong + col.CountInvalidatesRow + col.CountMissing;
+
+                // the proportion that were null
+                info.Frequency = total == 0 ? 0: (float)col.CountDBNull / (float)total;
+
+                tagInfo.Add(col.TargetProperty, info);
+            }
         }
 
         // record the oldest DQE date of all evaluations
