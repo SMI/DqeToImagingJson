@@ -82,6 +82,7 @@ internal class ModalityToJson
                 if (tagInfo.ContainsKey(col.TargetProperty))
                     continue;
 
+                // TODO : Handle dicom leaf node columns
                 var tag = DicomDictionary.Default.FirstOrDefault(t => t.Keyword == col.TargetProperty);
 
                 // its not a dicom tag
@@ -95,7 +96,7 @@ internal class ModalityToJson
                 var total = col.CountCorrect + col.CountWrong + col.CountInvalidatesRow + col.CountMissing;
 
                 // the proportion that were null
-                info.Frequency = total == 0 ? 0: (float)col.CountDBNull / (float)total;
+                info.Frequency = total == 0 ? 0: 1 - (float)col.CountDBNull / (float)total;
 
                 tagInfo.Add(col.TargetProperty, info);
             }
