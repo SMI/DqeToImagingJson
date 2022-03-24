@@ -1,4 +1,5 @@
-﻿using DqeToImagingJson;
+﻿using Dicom;
+using DqeToImagingJson;
 using Rdmp.Core.Curation.Data;
 using Rdmp.Core.DataQualityEngine.Data;
 using Rdmp.Core.Repositories;
@@ -80,7 +81,13 @@ internal class ModalityToJson
                 // we have already seen this tag in a higher level
                 if (tagInfo.ContainsKey(col.TargetProperty))
                     continue;
-                
+
+                var tag = DicomDictionary.Default.FirstOrDefault(t => t.Keyword == col.TargetProperty);
+
+                // its not a dicom tag
+                if (tag == null)
+                    continue;
+
                 var info = new TagInfo(col.TargetProperty);
                 info.Level = level;
 
