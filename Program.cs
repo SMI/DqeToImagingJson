@@ -5,11 +5,15 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using DqeToImagingJson;
+using ReusableLibraryCode.Checks;
 
 
-# region Where is the Catalogue Database?
+#region Where is the Catalogue Database?
 
 LinkedRepositoryProvider repo;
+
+bool logStartup = args.Contains("--logstartup");
+args = args.Except(new[] {"--logstartup" }).ToArray();
 
 if(args.Length == 0)
 {
@@ -41,6 +45,18 @@ else
 }
 
 #endregion
+
+var startup = new Startup(new EnvironmentInfo(),repo);
+ICheckNotifier checkNotifier = logStartup ? new ThrowImmediatelyCheckNotifier() {WriteToConsole=true } : new ToMemoryCheckNotifier();
+
+try
+{
+    startup.DoStartup(checkNotifier);
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex.ToString());
+}
 
 
 // Figure out modalities in the RDMP metadata database by name
