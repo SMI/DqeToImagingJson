@@ -30,9 +30,9 @@ internal class ModalityToJson
     internal ModalityInfo GetModalityInfo()
     {
         // if there is a study table
-        var study = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("StudyTable") && Regex.IsMatch(c.Name, options.OnlyPattern));
-        var series = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("SeriesTable") && Regex.IsMatch(c.Name, options.OnlyPattern));
-        var image = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("ImageTable") && Regex.IsMatch(c.Name, options.OnlyPattern));
+        var study = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("StudyTable") && Regex.IsMatch(c.Name, options.OnlyPattern,RegexOptions.IgnoreCase));
+        var series = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("SeriesTable") && Regex.IsMatch(c.Name, options.OnlyPattern, RegexOptions.IgnoreCase));
+        var image = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("ImageTable") && Regex.IsMatch(c.Name, options.OnlyPattern, RegexOptions.IgnoreCase));
 
         if (study != null)
         {

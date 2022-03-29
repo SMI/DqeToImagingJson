@@ -7,6 +7,7 @@ using System.Text.Json;
 using DqeToImagingJson;
 using ReusableLibraryCode.Checks;
 using CommandLine;
+using CommandLine.Text;
 
 public class Program
 {
@@ -115,4 +116,15 @@ class Options
 
     [Value(0, Required = false, HelpText = "Path to a yaml file that stores the connection strings to the RDMP platform databases.  Defaults to 'Databases.yaml'",Default = "Databases.yaml")]
     public string? DatabasesYaml { get; set; }
+
+    [Usage]
+    public static IEnumerable<Example> Examples
+    {
+        get
+        {
+            yield return new Example("Normal usage", new Options { DatabasesYaml = null, ModalityPattern = null, OnlyPattern = null});
+
+            yield return new Example("Run only on Catalogues with 'edris' in the name (case insensitive)", new Options { DatabasesYaml = null, ModalityPattern = null, OnlyPattern = "edris" });
+        }
+    }
 }
