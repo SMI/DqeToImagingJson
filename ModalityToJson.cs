@@ -4,19 +4,21 @@ using Rdmp.Core.Curation.Data;
 using Rdmp.Core.DataQualityEngine.Data;
 using Rdmp.Core.Repositories;
 using Rdmp.Core.Startup;
+using System.Text.RegularExpressions;
 
 internal class ModalityToJson
 {
     private Catalogue[] modalityCatalogues;
+    private readonly Options options;
     private DQERepository dqe;
     private ModalityInfo modalityInfo;
     private Dictionary<string, MonthCount> monthCounts;
     private Dictionary<string, TagInfo> tagInfo;
 
-    public ModalityToJson(string modality, Catalogue[] modalityCatalogues, LinkedRepositoryProvider repo)
+    public ModalityToJson(string modality, Catalogue[] modalityCatalogues, LinkedRepositoryProvider repo, Options options)
     {
         this.modalityCatalogues = modalityCatalogues;
-
+        this.options = options;
         this.dqe = new DQERepository(repo.CatalogueRepository);
 
         modalityInfo = new ModalityInfo();
@@ -28,9 +30,9 @@ internal class ModalityToJson
     internal ModalityInfo GetModalityInfo()
     {
         // if there is a study table
-        var study = modalityCatalogues.FirstOrDefault(c => c.Name.EndsWith("StudyTable"));
-        var series = modalityCatalogues.FirstOrDefault(c => c.Name.EndsWith("SeriesTable"));
-        var image = modalityCatalogues.FirstOrDefault(c => c.Name.EndsWith("ImageTable"));
+        var study = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("StudyTable") && Regex.IsMatch(c.Name, options.OnlyPattern));
+        var series = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("SeriesTable") && Regex.IsMatch(c.Name, options.OnlyPattern));
+        var image = modalityCatalogues.FirstOrDefault(c => c.Name.Contains("ImageTable") && Regex.IsMatch(c.Name, options.OnlyPattern));
 
         if (study != null)
         {
